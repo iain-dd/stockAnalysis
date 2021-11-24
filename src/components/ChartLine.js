@@ -1,7 +1,7 @@
-import React, { useState } from "react";
+import React from "react";
 import { Line } from "react-chartjs-2";
 
-const Chart = ({ xaxis, yaxis }) => {
+const Chart = ({ xaxis, yaxis, title }) => {
   if (xaxis == null) return null;
   else {
     return (
@@ -11,7 +11,8 @@ const Chart = ({ xaxis, yaxis }) => {
             labels: xaxis,
             datasets: [
               {
-                label: "test",
+                label: null,
+
                 data: yaxis,
                 fill: false,
                 tension: 0.25,
@@ -21,18 +22,21 @@ const Chart = ({ xaxis, yaxis }) => {
               },
             ],
           }}
-          height={400}
+          height={300}
           width={600}
           options={{
-            responsive: true,
-
+            responsive: false,
             plugins: {
-              title: {
-                display: true,
-                Text: "Dividend Payments",
+              legend: {
+                display: false,
               },
             },
-            maintainAspectRatio: true,
+            title: {
+              display: true,
+              Text: "Dividend Payments",
+            },
+
+            maintainAspectRatio: false,
           }}
         />
       </div>

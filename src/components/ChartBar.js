@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Bar, Line } from "react-chartjs-2";
+import React from "react";
+import { Bar } from "react-chartjs-2";
 
 const Chart = ({ xaxis, yaxis, title }) => {
   if (xaxis == null) return null;
@@ -24,7 +24,11 @@ const Chart = ({ xaxis, yaxis, title }) => {
           height={400}
           width={600}
           options={{
+            responsive: false,
             plugins: {
+              legend: {
+                display: false,
+              },
               title: {
                 display: true,
                 Text: "Dividend Payments",
@@ -32,7 +36,8 @@ const Chart = ({ xaxis, yaxis, title }) => {
                 align: "center",
               },
             },
-            maintainAspectRatio: false,
+            maintainAspectRatio: true,
+
             scales: {
               yAxes: [
                 {

@@ -3,11 +3,12 @@ import React, { useState } from "react";
 import ChartBar from "./components/ChartBar";
 import ChartLine from "./components/ChartLine";
 import Overview from "./components/Overview";
+import dateFormat from "dateformat";
+import CompanyName from "./components/CompanyName";
 
 function App() {
   const [dividendDate, setdividendDate] = useState(null);
   const [dividendAmount, setdividendAmount] = useState(null);
-  const [currency, setcurrency] = useState(null);
   const [company, setcompany] = useState(null);
   const [stock, setStock] = useState(null);
   const [prices, setprices] = useState(null);
@@ -15,6 +16,9 @@ function App() {
   const [cfDate, setcfDate] = useState(null);
   const [netIncome, setnetIncome] = useState(null);
   const [freeCashFlow, setfreeCashFlow] = useState(null);
+  const [statistics, setstatistics] = useState(null);
+  const [logo, setlogo] = useState(null);
+  const [symbol, setsymbol] = useState(null);
 
   var apiKey = "demo";
   //var apiKey = "482a4485230f4ddb917f5137fe4a0fab";
@@ -36,7 +40,9 @@ function App() {
         for (let i = 0; i < data.cash_flow.length; i++) {
           getfreeCashFlow.push(data.cash_flow[i].free_cash_flow);
           getnetIncome.push(data.cash_flow[i].operating_activities.net_income);
-          cashFlowDate.push(data.cash_flow[i].fiscal_date);
+          cashFlowDate.push(
+            dateFormat(data.cash_flow[i].fiscal_date, "mediumDate")
+          );
         }
         cashFlowDate.reverse();
         getnetIncome.reverse();
@@ -51,13 +57,11 @@ function App() {
     )
       .then((response) => response.json())
       .then((data) => {
-        setcurrency(data.meta.currency);
-
         console.log(data);
         const price = [];
         const priceDate = [];
         for (let i = 0; i < data.values.length; i++) {
-          priceDate.push(data.values[i].datetime);
+          priceDate.push(dateFormat(data.values[i].datetime, "mediumDate"));
           price.push(data.values[i].close);
         }
         priceDate.reverse();
@@ -80,7 +84,9 @@ function App() {
         const divAmount = [];
         const divDate = [];
         for (let i = 0; i < data.dividends.length; i++) {
-          divDate.push(data.dividends[i].payment_date);
+          divDate.push(
+            dateFormat(data.dividends[i].payment_date, "mediumDate")
+          );
           divAmount.push(data.dividends[i].amount);
         }
         divDate.reverse();
@@ -95,12 +101,25 @@ function App() {
       });
 
     fetch(
-      `https://api.twelvedata.com/profile?symbol=${stock}&apikey=${apiKey}&source=docs`
+      `https://api.twelvedata.com/statistics?symbol=${stock}&apikey=${apiKey}&source=docs`
     )
       .then((response) => response.json())
-      .then((data1) => {
-        setcompany(data1.name);
-        console.log(data1);
+      .then((data) => {
+        setcompany(data.meta.name);
+        setsymbol(data.meta.symbol);
+        setstatistics(data.statistics);
+        console.log(data);
+      })
+      .catch(() => {
+        console.log("error");
+      });
+    fetch(
+      `https://api.twelvedata.com/logo?symbol=${stock}&apikey=${apiKey}&source=docs`
+    )
+      .then((response) => response.json())
+      .then((data) => {
+        setlogo(data.url);
+        console.log(logo);
       })
       .catch(() => {
         console.log("error");
@@ -109,18 +128,45 @@ function App() {
 
   return (
     <div className="App">
-      <h1>Stock Overview</h1>
-      <h1>{company}</h1>
-      <h1>{currency}</h1>
+      <title>test</title>
+      <h1>Stock Analysis</h1>
       <section className="controls">
         <input type="text" placeholder="AAPL" onChange={handleChange} />
       </section>
       <button onClick={getStock}> Find Stock</button>
-      <Overview />
-      <ChartBar xaxis={dividendDate} yaxis={dividendAmount} title="dividend" />
-      <ChartBar xaxis={cfDate} yaxis={netIncome} title="test1" />
-      <ChartBar xaxis={cfDate} yaxis={freeCashFlow} title="test2" />
-      <ChartLine xaxis={pricesDate} yaxis={prices} />
+
+      <CompanyName logo={logo} company={company} symbol={symbol} />
+
+      <Overview statistics={statistics} />
+      <table calss="center">
+        <tr>
+          <th>Dividend</th>
+          <th>Net Income</th>
+          <th>Free Cashflow</th>
+          <th>Price</th>
+        </tr>
+        <tr>
+          <td>
+            <ChartBar
+              xaxis={dividendDate}
+              yaxis={dividendAmount}
+              title="dividend"
+            />
+          </td>
+          <td>
+            {" "}
+            <ChartBar xaxis={cfDate} yaxis={netIncome} title="test1" />
+          </td>
+          <td>
+            {" "}
+            <ChartBar xaxis={cfDate} yaxis={freeCashFlow} title="test2" />
+          </td>
+          <td>
+            {" "}
+            <ChartLine xaxis={pricesDate} yaxis={prices} title="Price" />
+          </td>
+        </tr>
+      </table>
     </div>
   );
 }

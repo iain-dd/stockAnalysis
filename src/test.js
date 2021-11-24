@@ -130,3 +130,26 @@ let arrays = [[1, 2, 3], [4, 5], 6];
 
 const flaten = arrays.reduce((a, b) => a.concat(b));
 console.log(flaten);
+
+var maxArea = function (height) {
+  let max = 0;
+  let min;
+  let count = 1;
+  for (let start = 0; start < height.length; start++) {
+    for (let end = count; end < height.length; end++) {
+      //console.log("value start:" + start + "  end:" + end)
+      //console.log((height[start] > height[end] ?height[end] : height[start] )* (end - start))
+      if (
+        (height[start] > height[end] ? height[end] : height[start]) *
+          (end - start) >
+        max
+      )
+        max =
+          (height[start] > height[end] ? height[end] : height[start]) *
+          (end - start);
+    }
+    count++;
+  }
+
+  return max;
+};
